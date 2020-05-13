@@ -1,6 +1,6 @@
 import time
 
-class Player:
+class PlayerObj:
     def __init__(self, un, pw):
         self.isMining = False
         self.logged = False

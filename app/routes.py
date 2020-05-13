@@ -1,6 +1,6 @@
 from app import app
 from app.worldmanager import WorldManager
-from app.player import Player
+from app.player import PlayerObj
 from flask import request, session, json, jsonify
 
 print("TEST1")
@@ -65,21 +65,21 @@ def playerState():
     if not 'loggedin' in session:
         return
     if session['loggedin']:
-        if session['player'].logged:
+        if users[session['user_player']].logged:
             x = request.values['moveX'] # -1 to 1
             y = request.values['moveY'] # -1 to 1
             mx = request.values['controlX'] # -1 to 1
             my = request.values['controlY'] # -1 to 1
             breaking = (request.values['breaking'] == 1) # 0 or 1
             # player us reverified
-            session['player'].reverify()
+            users[session['user_player']].reverify()
             # Move and do cursor position, create bounds because I don't trust people
-            session['player'].move(max(-1, min(1, x)), max(-1, min(1, y)))
-            session['player'].cursourPosition = [max(-1, min(1, mx)), max(-1, min(1, my))]
-            session['player'].isMining = breaking
+            users[session['user_player']].move(max(-1, min(1, x)), max(-1, min(1, y)))
+            users[session['user_player']].cursourPosition = [max(-1, min(1, mx)), max(-1, min(1, my))]
+            users[session['user_player']].isMining = breaking
         else:
             session['loggedin'] = False
-            session['player'] = None
+            session['user_player'] = None
 
 # Ticks stuff
 def update():
@@ -99,17 +99,22 @@ def login():
             for n in users:
                 if n.userID == session['un']:
                     exists = True
-                    if not n.logged and n.userPW == session['pw']:
+                    if n.userPW == session['pw']:
                         session['loggedin'] = True
-                        session['player'] = n
+                        session['user_player'] = users.index(n)
+                        n.logged = True
                     break
             if not exists:
-                player = Player(session['un'], session['pw'])
-                player.logged = True
-                session['player'] = player
-                users.append(player) 
-            return jsonify(result=session['loggedin'])
-    elif request.method == 'GET' and 'un' in session and 'pw' in session and session['loggedin'] and session['player'].logged:
-        return jsonify(result=True)
-    return jsonify(result=False)
+                _player = PlayerObj(session['un'], session['pw'])
+                _player.logged = True
+                users.append(_player)
+                session['user_player'] = users.index(_player)
+                session['loggedin'] = True
+            if session['loggedin']:
+                return jsonify(ret=True)
+            else:
+                return jsonify(ret=False)
+    elif request.method == 'GET' and 'un' in session and 'pw' in session and session['loggedin'] and users[session['user_player']].logged:
+        return jsonify(ret=True)
+    return jsonify(ret=False)
 

@@ -1,18 +1,17 @@
 import sys
+import requests
 from PySide2.QtUiTools import QUiLoader #allows us to import .ui files
 from PySide2.QtWidgets import QApplication, QLineEdit, QCheckBox
 from PySide2.QtCore import QFile, QObject
 
-_isConnected = False
-serverID = ''
+serverID = 'http://127.0.0.1:5000/'
 
-'''
-Billie Jean is not my lover.
-'''
-
-def connect():
+def connect(un, pw):
     print("Called connect")
-    # TODO: Attempt to login
+    for x in range(5):
+        x = requests.post(serverID + 'login', {'un':un, 'pw':pw})
+        if x.status_code == 200:
+            return x.json()['ret']
 
 def verifyConnection():
     print("Called verify")
@@ -23,6 +22,9 @@ class MainWindow(QObject):
     #class constructor
     def __init__(self, ui_file, parent=None):
 
+        self.un = ""
+        self.pw = ""
+        self.connected = False
         #call parent QObject constructor
         super(MainWindow, self).__init__(parent)
 
@@ -36,20 +38,22 @@ class MainWindow(QObject):
         ui_file.close()
 
         # perform login
-        self.window.Clear.clicked.connect(self.clear)
+        self.window.pushButton.clicked.connect(self.login)
 
         #show window to user
         self.window.show()
     
-    def clear(self):
-        # TODO: Find un and pw and attempt a pingie-dingie
-        for i in [0, 1]:
-            self.binaryVals[i] = 0
-            for n in list(range(8))[::-1]:
-                box = self.window.findChild(QCheckBox, 'Reactant' + str(i+1) + '_' + str(n+1))
-                if box.isChecked():
-                    self.binaryVals[i] += 2 ** n
+    def login(self):
+        self.un = self.window.findChild(QLineEdit, 'Username').text()
+        self.pw = self.window.findChild(QLineEdit, 'Password').text()
+        self.connected = connect(self.un, self.pw)
+        if self.connected:
+            app.quit()
+            # TODO: Reveal Pygame
 
 if __name__ == '__main__':
-    main_window = MainWindow('login.ui')
-    sys.exit(app.exec_())
+    app = QApplication(sys.argv)
+    main_window = MainWindow('client/login.ui')
+    app.exec_()
+    print("test")
+    sys.exit(0)
