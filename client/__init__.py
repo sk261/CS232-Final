@@ -11,9 +11,11 @@ Billie Jean is not my lover.
 '''
 
 def connect():
+    print("Called connect")
     # TODO: Attempt to login
 
 def verifyConnection():
+    print("Called verify")
     # TODO
     
 class MainWindow(QObject):

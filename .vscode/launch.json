@@ -26,18 +26,8 @@
             "name": "Client",
             "type": "python",
             "request": "launch",
-            "module": "python",
-            "env": {
-                "FLASK_APP": "app.py",
-                "FLASK_ENV": "development",
-                "FLASK_DEBUG": "0"
-            },
-            "args": [
-                "run",
-                "--no-debugger",
-                "--no-reload"
-            ],
-            "jinja": true
+            "program": "client/__init__.py",
+            "console": "integratedTerminal"
         }
     ]
 }

@@ -1,13 +1,13 @@
 from app import app
 from app.worldmanager import WorldManager
 from app.player import Player
-from flask import request, session, json
+from flask import request, session, json, jsonify
 
 print("TEST1")
 
 users = []
 world = WorldManager()
-world.generate(5000, 5000) # small enough of a world for now
+world.generate(120, 120) # small enough of a world for now
 
 print("TEST")
 
@@ -17,11 +17,11 @@ def worldState():
     # NOTE: Good thing this isn't a security final
 
     # TODO: return all the pixels and online player positions
-    if not 'loggedin' in session or not session['player'].logged:
-        return
+#    if not 'loggedin' in session or not session['player'].logged:
+#        return jsonify(err=1)
     
-    position = session['player'].position
-
+#    position = session['player'].position
+    position = [0,0]
     # Player windows will be 500x500 until I decides otherwise
     pixels = world.getView(position[0], position[1], 500, 500)
     pixelX = ""
@@ -55,7 +55,7 @@ def worldState():
                     pixelRGB=pixelRGB,
                     playerX=playerX,
                     playerY=playerY,
-                    playerID=payerID)
+                    playerID=playerID)
 
 
 

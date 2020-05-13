@@ -9,10 +9,10 @@ class WorldManager:
     
     def getView(self, x, y, width, height):
         # Returns the view, all the pixels the player sees on their screen
-        blocks = self._getBlocksBetweenCoords(x-width/2, height-width/2, x+width/2, height+width/2)
+        blocks = self._getBlocksBetweenCoords(x-width/2, y-height/2, x+width/2, y+height/2)
         ret = []
         for block in blocks:
-            for pixel in pixels[block[0]][block[1]]:
+            for pixel in self.pixels[block[0]][block[1]]:
                 if (pixel.position[0] >= x-width/2 and pixel.position[0] <= x+width/2 and 
                     pixel.position[1] >= y-height/2 and pixel.position[1] <= y+height/2):
                     ret.append([pixel.position[0], pixel.position[1], pixel.colour, pixel.motionBlur])
@@ -42,8 +42,8 @@ class WorldManager:
         self.height = math.ceil(height / self._squareSize)
 
         # Create empty blocks
-        for x in range(-math.floor(self.width / 2), math.floor(self.width / 2)):
-            for y in range(-math.floor(self.height / 2), math.floor(self.height / 2)):
+        for x in range(-math.floor(self.width / 2), 1+math.floor(self.width / 2)):
+            for y in range(-math.floor(self.height / 2), 1+math.floor(self.height / 2)):
                 if not x in self.pixels:
                     self.pixels[x] = {}
                 self.pixels[x][y] = []
@@ -71,21 +71,20 @@ class WorldManager:
                 # Maybe just reduce the world size for the sake of testing?
                 for _x in range(math.floor((x-.5)*self._squareSize), math.floor((x+.5)*self._squareSize)):
                     for _y in range(math.floor((y-.5)*self._squareSize), math.floor((y+.5)*self._squareSize)):
-                        print(str(_x) + ", " + str(_y))
-                        if random.randint(0,math.floor(100*density)) > 10: # 10% empty rate? Sure.
+                        if random.randint(0,math.floor(100*density)) < 10: # 10% empty rate? Sure.
                             self.pixels[x][y].append(Pixel(_x, _y, RGB[0], RGB[1], RGB[2]))
                 
-    def _getBlockByCoords(x, y):
+    def _getBlockByCoords(self, x, y):
         _x = math.floor(x / self._squareSize + .5)
         _y = math.floor(y / self._squareSize + .5)
         return (_x, _y)
     
-    def _getBlocksBetweenCoords(x1, y1, x2, y2):
+    def _getBlocksBetweenCoords(self, x1, y1, x2, y2):
         ret = []
         _x1, _y1 = self._getBlockByCoords(x1, y1)
         _x2, _y2 = self._getBlockByCoords(x2, y2)
-        for x in range(_x1, _x2+1):
-            for y in range(_y1, _y2+1):
+        for x in range(_x1, _x2+2):
+            for y in range(_y1, _y2+2):
                 if x in self.pixels:
                     if y in self.pixels[x]:
                         ret.append([x, y])
