@@ -6,7 +6,7 @@ python -m venv venv
 pip install flask
 pip install PySide2
 pip install requests
-
+pip install pygame
 '''
 
 

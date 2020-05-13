@@ -1,8 +1,9 @@
 import sys
 import requests
+import game
 from PySide2.QtUiTools import QUiLoader #allows us to import .ui files
 from PySide2.QtWidgets import QApplication, QLineEdit, QCheckBox
-from PySide2.QtCore import QFile, QObject
+from PySide2.QtCore import QFile, QObject, QCoreApplication
 
 serverID = 'http://127.0.0.1:5000/'
 
@@ -12,10 +13,6 @@ def connect(un, pw):
         x = requests.post(serverID + 'login', {'un':un, 'pw':pw})
         if x.status_code == 200:
             return x.json()['ret']
-
-def verifyConnection():
-    print("Called verify")
-    # TODO
     
 class MainWindow(QObject):
 
@@ -48,12 +45,12 @@ class MainWindow(QObject):
         self.pw = self.window.findChild(QLineEdit, 'Password').text()
         self.connected = connect(self.un, self.pw)
         if self.connected:
+            self.window.hide()
             app.quit()
-            # TODO: Reveal Pygame
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     main_window = MainWindow('client/login.ui')
     app.exec_()
-    print("test")
+    game.runGame(serverID, main_window.un, main_window.pw)
     sys.exit(0)
